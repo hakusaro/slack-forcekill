@@ -12,8 +12,8 @@ get '/forcekill?' do
   end
 
   unless ENV['slack_valid_users'].include? params['user_id']
-    status 200
-    return "No authentication; invalid user."
+    halt 400
+    return "That didn't work. Feel like it should? Run /uid and give your ID to a valid user."
   end
 
   resp = Slack.search_all({:query => "from:#{params['text']}", :count => 500})
@@ -24,5 +24,15 @@ get '/forcekill?' do
     Slack.chat_delete({:ts => ts, :channel => channel})
   end
   status 200
-  "In theory that worked. If it didn't, you need to wait a minute and try again so that the channel & search backends are up to date."
+  "Did that help? If it didn't, you need to wait a minute and try again so that the channel & search backends are up to date. Usually, the most recent 5 messages aren't processed."
+end
+
+get '/uid?' do
+  status 200
+  "Your Slack UserID is #{params['user_id']}."
+end
+
+get '/' do
+  status 200
+  "Ok."
 end
